@@ -22,3 +22,19 @@ module SimpleCov
     end
   end
 end
+
+# Overlay patch fix for https://github.com/simplecov-ruby/simplecov/pull/972.
+
+module SimpleCovCombineFix
+  def combine(coverage_a, coverage_b)
+    super.tap do |result|
+      if SimpleCov.branch_coverage?
+        result['branches'] ||= {}
+      end
+    end
+  end
+end
+
+class << SimpleCov::Combine::FilesCombiner
+  prepend(SimpleCovCombineFix)
+end
